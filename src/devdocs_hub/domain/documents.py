@@ -3,6 +3,7 @@ from dataclasses import dataclass
 
 @dataclass
 class Document:
+    """A representation of a document"""
     id: int | None
     title: str
     source: str

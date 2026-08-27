@@ -1,5 +1,7 @@
-from hypothesis import given, strategies as st
+from hypothesis import given
+from hypothesis import strategies as st
 from pytest import raises
+
 from devdocs_hub.domain.documents import Document
 
 
@@ -21,7 +23,7 @@ class TestDocuments:
 
     def test_empty_title_raises(self):
         with raises(ValueError):
-            document = Document(id=0, title='', source='citation', content='')
+            Document(id=0, title='', source='citation', content='')
 
 
 
