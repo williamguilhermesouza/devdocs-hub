@@ -2,24 +2,27 @@
 # so nice, but i'll use it here
 class Repository[T]:
     def __init__(self):
-        self.data: dict[int, T] = {}
-        self.next_id: int = 0
+        self._data: dict[int, T] = {}
+        self._next_id: int = 0
 
     def add(self, item: T) -> T:
-        self.data[self.next_id] = item
-        self.next_id += 1
+        self._data[self._next_id] = item
+        self._next_id += 1
         return item
 
     def get(self, id: int) -> T | None:
-        return self.data.get(id)
+        return self._data.get(id)
 
     def list(self) -> list[T]:
-        return list(self.data.values())
+        return list(self._data.values())
 
     def delete(self, id: int) -> bool:
-        if id in self.data:
-            del self.data[id]
+        if id in self._data:
+            del self._data[id]
             return True
         
         return False
+
+    def get_next_id(self) -> int:
+        return self._next_id
 
