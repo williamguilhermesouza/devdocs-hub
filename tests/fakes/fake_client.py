@@ -1,6 +1,7 @@
 from devdocs_hub.application.protocols import Response
 from devdocs_hub.ingestion.errors import FetchError
 
+
 class FakeClient:
     def __init__(self, raises: bool = False):
         self.raises = raises

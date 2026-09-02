@@ -1,9 +1,10 @@
 import asyncio
+
 from pytest import raises
 
-from tests.fakes.fake_client import FakeClient
-from devdocs_hub.ingestion.fetcher import Fetcher
 from devdocs_hub.ingestion.errors import FetchError
+from devdocs_hub.ingestion.fetcher import Fetcher
+from tests.fakes.fake_client import FakeClient
 
 
 class TestFetcher:
@@ -20,7 +21,7 @@ class TestFetcher:
         url = "http://example.org"
 
         with raises(FetchError):
-            fetched: str = asyncio.run(fetcher.fetch_url(url))
+            asyncio.run(fetcher.fetch_url(url))
 
     def test_timeout(self):
         client = FakeClient(raises=True)
@@ -28,7 +29,7 @@ class TestFetcher:
         url = "http://example.org"
 
         with raises(FetchError):
-            fetched: str = asyncio.run(fetcher.fetch_url(url))
+            asyncio.run(fetcher.fetch_url(url))
 
     def test_3urlfetchedconcurrently(self):
         client = FakeClient()

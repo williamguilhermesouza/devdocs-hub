@@ -1,5 +1,6 @@
 import asyncio
-from httpx import AsyncClient
+
+from httpx import HTTPStatusError, TimeoutException
 
 from devdocs_hub.application.protocols import HttpClientProtocol
 from devdocs_hub.ingestion.errors import FetchError
@@ -17,7 +18,7 @@ class Fetcher:
         try:
             response = await self.client.get(url)
             response.raise_for_status()
-        except Exception as e:
+        except (HTTPStatusError, TimeoutException) as e:
             raise FetchError(e)
 
         return response.text

@@ -1,5 +1,3 @@
-from abc import abstractmethod
-from typing import Protocol
 
 # usually generic repository is not 
 # so nice, but i'll use it here
