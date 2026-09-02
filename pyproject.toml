@@ -7,7 +7,9 @@ authors = [
     { name = "williamguilhermesouza", email = "williamguilhermesouza@gmail.com" }
 ]
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "httpx>=0.28.1",
+]
 
 [project.scripts]
 devdocs-hub = "devdocs_hub:main"

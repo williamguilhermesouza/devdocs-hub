@@ -1,10 +1,10 @@
 from devdocs_hub.application.errors import DocumentNotFound
+from devdocs_hub.application.protocols import RepositoryProtocol
 from devdocs_hub.domain.documents import Document
-from devdocs_hub.domain.repository import Repository
 
 
 class DocumentService:
-    def __init__(self, repository: Repository[Document]):
+    def __init__(self, repository: RepositoryProtocol[Document]):
         self._repository = repository
 
     def create_document(self, title: str, source: str, content: str) -> Document:

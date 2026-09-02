@@ -1,6 +1,9 @@
+from abc import abstractmethod
+from typing import Protocol
+
 # usually generic repository is not 
 # so nice, but i'll use it here
-class Repository[T]:
+class InMemoryRepository[T]:
     def __init__(self):
         self._data: dict[int, T] = {}
         self._next_id: int = 0
