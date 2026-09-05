@@ -1,4 +1,5 @@
 import asyncio
+
 from pytest import raises
 
 from devdocs_hub.ingestion.fetcher import Fetcher
