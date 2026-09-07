@@ -2,15 +2,15 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
+from devdocs_hub.api.schemas.documents import (
+    DocumentCreate,
+    DocumentListResponse,
+    DocumentResponse,
+)
 from devdocs_hub.application.documents import DocumentService
 from devdocs_hub.application.errors import DocumentNotFound
 from devdocs_hub.domain.documents import Document
 from devdocs_hub.domain.repository import InMemoryRepository
-from devdocs_hub.api.schemas.documents import (
-    DocumentCreate,
-    DocumentResponse,
-    DocumentListResponse,
-)
 
 repository = InMemoryRepository[Document]()
 
@@ -33,12 +33,12 @@ async def get_documents(service: serviceDeps) -> DocumentListResponse:
     return res
 
 
-@router.get("/{doc_id}", responses={422: {"description": "invalid request"}})
+@router.get("/{doc_id}", responses={status.HTTP_422_UNPROCESSABLE_CONTENT: {"description": "invalid request"}})
 async def get_document(service: serviceDeps, doc_id: int) -> DocumentResponse:
     try:
         doc = service.get_document(doc_id)
 
-    except DocumentNotFound as e:
+    except DocumentNotFound:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Requested document not found"
         )
@@ -54,7 +54,7 @@ async def create_document(
     return DocumentResponse.from_doc(res)
 
 
-@router.delete("/", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{doc_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_document(service: serviceDeps, doc_id: int) -> None:
     if not service.delete_document(doc_id):
         raise HTTPException(

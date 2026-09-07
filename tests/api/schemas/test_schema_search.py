@@ -1,9 +1,9 @@
 
-from hypothesis import strategies as st
 from hypothesis import given
+from hypothesis import strategies as st
 from pydantic import HttpUrl, ValidationError
-from pydantic_core import to_json
 from pytest import raises
+
 from devdocs_hub.api.schemas.search import SearchRequest, SearchResult
 
 
