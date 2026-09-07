@@ -17,7 +17,7 @@ class DocumentService:
 
         return added
 
-    def get_document(self, id: int) -> Document | None:
+    def get_document(self, id: int) -> Document:
         doc = self._repository.get(id)
 
         if doc is None:
