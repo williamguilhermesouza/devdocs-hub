@@ -25,8 +25,10 @@ class DocumentService:
 
         return doc
 
-    def list_documents(self) -> list[Document]:
-        return self._repository.list()
+    def list_documents(self, offset: int = 0, limit: int = 20) -> list[Document]:
+        docs = self._repository.list()
+        return docs[offset:offset + limit]
+
 
     def delete_document(self, id: int) -> bool:
         return self._repository.delete(id)

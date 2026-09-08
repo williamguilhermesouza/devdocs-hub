@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from devdocs_hub.api.dependencies import get_document_service
 from devdocs_hub.api.schemas.documents import (
@@ -18,14 +18,28 @@ router = APIRouter(
 )
 
 
-@router.get("/")
-async def get_documents(service: serviceDeps) -> DocumentListResponse:
-    docs = service.list_documents()
+@router.get(
+    "/",
+    responses={
+        status.HTTP_422_UNPROCESSABLE_CONTENT: {"description": "invalid request"}
+    },
+)
+async def get_documents(
+    service: serviceDeps,
+    offset: Annotated[int, Query(ge=0)] = 0,
+    limit: Annotated[int, Query(gt=0, le=100)] = 20,
+) -> DocumentListResponse:
+    docs = service.list_documents(offset, limit)
     res = DocumentListResponse.from_docs(docs)
     return res
 
 
-@router.get("/{doc_id}", responses={status.HTTP_422_UNPROCESSABLE_CONTENT: {"description": "invalid request"}})
+@router.get(
+    "/{doc_id}",
+    responses={
+        status.HTTP_422_UNPROCESSABLE_CONTENT: {"description": "invalid request"}
+    },
+)
 async def get_document(service: serviceDeps, doc_id: int) -> DocumentResponse:
     try:
         doc = service.get_document(doc_id)

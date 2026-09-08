@@ -96,3 +96,59 @@ class TestDocumentRouter:
     def test_get_document_not_found(self, client: TestClient):
         res = client.get("/documents/999")
         assert res.status_code == status.HTTP_404_NOT_FOUND
+    
+    def test_valid_offset_param(self, client: TestClient):
+        offset = 0;
+        res = client.get("/documents", params={"offset": offset});
+        assert res.status_code == status.HTTP_200_OK
+        assert res.json()['total'] == 2
+
+        offset = 1;
+        res = client.get("/documents", params={"offset": offset});
+        assert res.status_code == status.HTTP_200_OK
+        assert res.json()['total'] == 1
+
+        offset = 10;
+        res = client.get("/documents", params={"offset": offset});
+        assert res.status_code == status.HTTP_200_OK
+
+        offset = 10000;
+        res = client.get("/documents", params={"offset": offset});
+        assert res.status_code == status.HTTP_200_OK
+
+    def test_valid_limit_param(self, client: TestClient):
+        limit = 1;
+        res = client.get("/documents", params={"limit": limit});
+        assert res.status_code == status.HTTP_200_OK
+        assert res.json()['total'] == 1
+
+        limit = 10;
+        res = client.get("/documents", params={"limit": limit});
+        assert res.status_code == status.HTTP_200_OK
+        assert res.json()['total'] == 2
+
+        limit = 50;
+        res = client.get("/documents", params={"limit": limit});
+        assert res.status_code == status.HTTP_200_OK
+
+        limit = 100;
+        res = client.get("/documents", params={"limit": limit});
+        assert res.status_code == status.HTTP_200_OK
+
+    def test_zero_limit_param(self, client: TestClient):
+        res = client.get("/documents", params={"limit": 0});
+        assert res.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+
+    def test_negative_offset_param(self, client: TestClient):
+        res = client.get("/documents", params={"offset": -3});
+        assert res.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+
+    def test_negative_limit_param(self, client: TestClient):
+        res = client.get("/documents", params={"limit": -4});
+        assert res.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+
+    def test_out_of_range_limit_param(self, client: TestClient):
+        res = client.get("/documents", params={"limit": 101});
+        assert res.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+ 
+
