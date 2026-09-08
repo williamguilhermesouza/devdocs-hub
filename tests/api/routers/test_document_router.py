@@ -3,8 +3,8 @@ from fastapi.testclient import TestClient
 from pydantic import HttpUrl
 from pytest import fixture
 
+from devdocs_hub.api.dependencies import get_document_service
 from devdocs_hub.api.main import app
-from devdocs_hub.api.routers.documents import get_document_service
 from devdocs_hub.api.schemas.documents import DocumentCreate
 from devdocs_hub.application.documents import DocumentService
 from devdocs_hub.domain.documents import Document

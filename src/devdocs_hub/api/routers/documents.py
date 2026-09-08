@@ -2,6 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
+from devdocs_hub.api.dependencies import get_document_service
 from devdocs_hub.api.schemas.documents import (
     DocumentCreate,
     DocumentListResponse,
@@ -9,15 +10,6 @@ from devdocs_hub.api.schemas.documents import (
 )
 from devdocs_hub.application.documents import DocumentService
 from devdocs_hub.application.errors import DocumentNotFound
-from devdocs_hub.domain.documents import Document
-from devdocs_hub.domain.repository import InMemoryRepository
-
-repository = InMemoryRepository[Document]()
-
-
-def get_document_service() -> DocumentService:
-    return DocumentService(repository)
-
 
 serviceDeps = Annotated[DocumentService, Depends(get_document_service)]
 
