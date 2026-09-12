@@ -64,8 +64,31 @@ class DocumentRepository:
         with self._engine.connect() as conn:
             result = conn.execute(stmt)
             conn.commit()
+            return result.rowcount == 1
 
-        return result.rowcount == 1
+    # NOTE - maybe this should go into service with unit of work in the future?
+    def create_document_with_first_chunk(self, item: Document) -> Document:
+        doc_stmt = (
+            insert(self._db.documents)
+            .values(title=item.title, source=item.source, content=item.content)
+            .returning(self._db.documents.c.id)
+        )
+
+        with self._engine.begin() as conn:
+            result = conn.execute(doc_stmt)
+            row = result.fetchone()
+            if row is None:
+                return item
+
+            item.id = row.id
+
+            chunk_stmt = insert(self._db.chunks).values(
+                document_id=item.id, position=0, content=item.content, embedding_id=None
+            )
+
+            conn.execute(chunk_stmt)
+
+        return item
 
     def get_next_id(self) -> int:
         return 0
