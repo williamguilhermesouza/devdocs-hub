@@ -14,8 +14,8 @@ class InMemoryRepository[T]:
     def get(self, id: int) -> T | None:
         return self._data.get(id)
 
-    def list(self) -> list[T]:
-        return list(self._data.values())
+    def list(self, offset: int = 0, limit: int = 20) -> list[T]:
+        return list(self._data.values())[offset:offset+limit]
 
     def delete(self, id: int) -> bool:
         if id in self._data:

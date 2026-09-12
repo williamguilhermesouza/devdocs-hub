@@ -1,14 +1,15 @@
+from datetime import UTC, datetime
+
 from sqlalchemy import (
+    Column,
     DateTime,
+    Engine,
+    ForeignKey,
     Integer,
     MetaData,
     String,
     Table,
-    Column,
-    ForeignKey,
-    Engine,
 )
-from datetime import datetime, timezone
 
 
 class Database:
@@ -35,7 +36,7 @@ class Database:
             Column(
                 "created_at",
                 DateTime(timezone=True),
-                default=lambda: datetime.now(timezone.utc),
+                default=lambda: datetime.now(UTC),
             ),
         )
         self.chunks = Table(
