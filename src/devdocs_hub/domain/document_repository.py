@@ -1,6 +1,9 @@
-from sqlalchemy import Engine, delete, insert, select
+from sqlalchemy import Engine, insert, select
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
 
-from devdocs_hub.db.core import Database
+from devdocs_hub.db.core import Chunk, Database
+from devdocs_hub.db.core import Document as DbDocument
 
 from .documents import Document
 
@@ -12,27 +15,26 @@ class DocumentRepository:
 
     def add(self, item: Document) -> Document:
         stmt = (
-            insert(self._db.documents)
+            insert(DbDocument)
             .values(title=item.title, source=item.source, content=item.content)
-            .returning(self._db.documents.c.id)
+            .returning(DbDocument)
         )
 
-        with self._engine.connect() as conn:
-            result = conn.execute(stmt)
-            row = result.fetchone()
-            if row is None:
+        with Session(self._engine) as session:
+            result = session.scalar(stmt)
+            if result is None:
                 return item
 
-            item.id = row.id
-            conn.commit()
+            session.commit()
+            item.id = result.id
 
         return item
 
     def get(self, id: int) -> Document | None:
-        stmt = select(self._db.documents).where(self._db.documents.c.id == id)
+        stmt = select(DbDocument).where(DbDocument.id == id)
 
-        with self._engine.connect() as conn:
-            result = conn.execute(stmt).first()
+        with Session(self._engine) as session:
+            result = session.scalar(stmt)
 
             return (
                 None
@@ -46,11 +48,11 @@ class DocumentRepository:
             )
 
     def list(self, offset: int, limit: int) -> list[Document]:
-        stmt = select(self._db.documents).offset(offset).limit(limit)
+        stmt = select(DbDocument).offset(offset).limit(limit)
 
-        with self._engine.connect() as conn:
-            result = conn.execute(stmt).all()
-            conn.commit()
+        with Session(self._engine) as session:
+            result = session.scalars(stmt).all()
+
             return [
                 Document(id=d.id, title=d.title, source=d.source, content=d.content)
                 for d in result
@@ -59,34 +61,44 @@ class DocumentRepository:
         return []
 
     def delete(self, id: int) -> bool:
-        stmt = delete(self._db.documents).where(self._db.documents.c.id == id)
+        get_stmt = select(DbDocument).where(DbDocument.id == id)
 
-        with self._engine.connect() as conn:
-            result = conn.execute(stmt)
-            conn.commit()
-            return result.rowcount == 1
+        with Session(self._engine) as session:
+            result = session.scalar(get_stmt)
+            if not result:
+                return False
 
-    # NOTE - maybe this should go into service with unit of work in the future?
+            session.delete(result)
+            session.commit()
+            return True
+
     def create_document_with_first_chunk(self, item: Document) -> Document:
         doc_stmt = (
-            insert(self._db.documents)
+            insert(DbDocument)
             .values(title=item.title, source=item.source, content=item.content)
-            .returning(self._db.documents.c.id)
+            .returning(DbDocument.id)
         )
 
-        with self._engine.begin() as conn:
-            result = conn.execute(doc_stmt)
-            row = result.fetchone()
-            if row is None:
-                return item
+        with Session(self._engine) as session:
+            try:
+                result = session.scalar(doc_stmt)
 
-            item.id = row.id
+                if result is None:
+                    raise SQLAlchemyError("failed creating document")
 
-            chunk_stmt = insert(self._db.chunks).values(
-                document_id=item.id, position=0, content=item.content, embedding_id=None
-            )
+                item.id = result
 
-            conn.execute(chunk_stmt)
+                chunk_stmt = insert(Chunk).values(
+                    document_id=item.id,
+                    position=0,
+                    content=item.content,
+                    embedding_id=None,
+                )
+
+                session.add(chunk_stmt)
+                session.commit()
+            except SQLAlchemyError:
+                session.rollback()
 
         return item
 
