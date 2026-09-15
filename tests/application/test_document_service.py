@@ -94,4 +94,3 @@ class TestDocumentService:
 
         for i, doc in enumerate(docs):
             assert doc.title == f'title{i}'
-

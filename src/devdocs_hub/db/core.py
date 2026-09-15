@@ -1,5 +1,4 @@
 from datetime import UTC, datetime
-from typing import List
 
 from sqlalchemy import (
     DateTime,
@@ -36,7 +35,7 @@ class Document(Base):
     title: Mapped[str] = mapped_column(nullable=False)
     source: Mapped[str]
     content: Mapped[str]
-    chunks: Mapped[List["Chunk"]] = relationship(back_populates="document")
+    chunks: Mapped[list["Chunk"]] = relationship(back_populates="document")
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(UTC)
     )

@@ -1,5 +1,4 @@
-from sqlalchemy import Engine, insert, select
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy import Engine, select
 from sqlalchemy.orm import Session
 
 from devdocs_hub.db.core import Chunk, Database
@@ -14,21 +13,7 @@ class DocumentRepository:
         self._db = db
 
     def add(self, item: Document) -> Document:
-        stmt = (
-            insert(DbDocument)
-            .values(title=item.title, source=item.source, content=item.content)
-            .returning(DbDocument)
-        )
-
-        with Session(self._engine) as session:
-            result = session.scalar(stmt)
-            if result is None:
-                return item
-
-            session.commit()
-            item.id = result.id
-
-        return item
+        return self.create_document_with_first_chunk(item)
 
     def get(self, id: int) -> Document | None:
         stmt = select(DbDocument).where(DbDocument.id == id)
@@ -73,32 +58,21 @@ class DocumentRepository:
             return True
 
     def create_document_with_first_chunk(self, item: Document) -> Document:
-        doc_stmt = (
-            insert(DbDocument)
-            .values(title=item.title, source=item.source, content=item.content)
-            .returning(DbDocument.id)
-        )
+        with Session(self._engine) as session, session.begin():
+                db_document = DbDocument(title=item.title, source=item.source, content=item.content)
+                session.add(db_document)
+                session.flush()
 
-        with Session(self._engine) as session:
-            try:
-                result = session.scalar(doc_stmt)
 
-                if result is None:
-                    raise SQLAlchemyError("failed creating document")
-
-                item.id = result
-
-                chunk_stmt = insert(Chunk).values(
-                    document_id=item.id,
+                chunk = Chunk(
+                    document_id=db_document.id,
                     position=0,
                     content=item.content,
                     embedding_id=None,
                 )
+                session.add(chunk)
 
-                session.add(chunk_stmt)
-                session.commit()
-            except SQLAlchemyError:
-                session.rollback()
+                item.id = db_document.id
 
         return item
 
