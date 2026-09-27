@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
-from devdocs_hub.api.dependencies import get_document_service
+from devdocs_hub.api.dependencies import serviceDeps
 from devdocs_hub.api.schemas.documents import (
     DocumentCreate,
     DocumentListResponse,
@@ -10,8 +10,6 @@ from devdocs_hub.api.schemas.documents import (
 )
 from devdocs_hub.application.documents import DocumentService
 from devdocs_hub.application.errors import DocumentNotFound
-
-serviceDeps = Annotated[DocumentService, Depends(get_document_service)]
 
 router = APIRouter(
     prefix="/documents",

@@ -8,9 +8,8 @@ from .documents import Document
 
 
 class DocumentRepository:
-    def __init__(self, engine: Engine, db: Database):
-        self._engine = engine
-        self._db = db
+    def __init__(self, session: Session):
+        self._session = session
 
     def add(self, item: Document) -> Document:
         return self.create_document_with_first_chunk(item)
@@ -18,7 +17,7 @@ class DocumentRepository:
     def get(self, id: int) -> Document | None:
         stmt = select(DbDocument).where(DbDocument.id == id)
 
-        with Session(self._engine) as session:
+        with self._session as session:
             result = session.scalar(stmt)
 
             return (
@@ -35,7 +34,7 @@ class DocumentRepository:
     def list(self, offset: int, limit: int) -> list[Document]:
         stmt = select(DbDocument).offset(offset).limit(limit)
 
-        with Session(self._engine) as session:
+        with self._session as session:
             result = session.scalars(stmt).all()
 
             return [
@@ -48,7 +47,7 @@ class DocumentRepository:
     def delete(self, id: int) -> bool:
         get_stmt = select(DbDocument).where(DbDocument.id == id)
 
-        with Session(self._engine) as session:
+        with self._session as session:
             result = session.scalar(get_stmt)
             if not result:
                 return False
@@ -58,7 +57,7 @@ class DocumentRepository:
             return True
 
     def create_document_with_first_chunk(self, item: Document) -> Document:
-        with Session(self._engine) as session, session.begin():
+        with self._session as session, session.begin():
                 db_document = DbDocument(title=item.title, source=item.source, content=item.content)
                 session.add(db_document)
                 session.flush()
