@@ -1,7 +1,7 @@
-from sqlalchemy import Engine, select
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from devdocs_hub.db.core import Chunk, Database
+from devdocs_hub.db.core import Chunk
 from devdocs_hub.db.core import Document as DbDocument
 
 from .documents import Document

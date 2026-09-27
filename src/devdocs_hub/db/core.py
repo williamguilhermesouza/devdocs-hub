@@ -2,19 +2,10 @@ from datetime import UTC, datetime
 
 from sqlalchemy import (
     DateTime,
-    Engine,
     ForeignKey,
     String,
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-
-
-class Database:
-    def __init__(self, engine: Engine):
-        self._engine = engine
-
-    def init(self):
-        Base.metadata.create_all(self._engine)
 
 
 class Base(DeclarativeBase):
