@@ -35,9 +35,15 @@ class Document(Base):
     title: Mapped[str] = mapped_column(nullable=False)
     source: Mapped[str]
     content: Mapped[str]
+    language: Mapped[str] = mapped_column(nullable=True)
     chunks: Mapped[list["Chunk"]] = relationship(back_populates="document")
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(UTC)
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
     )
 
 
