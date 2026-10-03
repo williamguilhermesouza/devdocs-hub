@@ -1,0 +1,27 @@
+import asyncio
+import re
+from devdocs_hub.application.documents import DocumentService
+from devdocs_hub.domain.documents import Document
+from devdocs_hub.ingestion.fetcher import Fetcher
+
+
+class DocumentIngestionService:
+    def __init__(self, fetcher: Fetcher, docsSv: DocumentService):
+        self._fetcher = fetcher
+        self._doc = docsSv
+        self._re = re.compile(r'<title\b[^>]*>(.*?)</title>')
+
+    async def ingest_url(self, url: str) -> Document:
+        content = await self._fetcher.fetch_url(url)
+        title = self.get_title(content)
+        created_doc = self._doc.create_document(title=title, content=content, source=url)
+        return created_doc
+
+
+    def get_title(self, content: str) -> str:
+        matched = self._re.search(content, re.IGNORECASE | re.DOTALL)
+        return matched.group(1) if matched else ''
+
+
+
+
