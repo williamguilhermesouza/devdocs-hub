@@ -27,7 +27,7 @@ class Document(Base):
     source: Mapped[str]
     content: Mapped[str]
     language: Mapped[str] = mapped_column(nullable=True)
-    chunks: Mapped[list["Chunk"]] = relationship(back_populates="document")
+    chunks: Mapped[list["Chunk"]] = relationship(back_populates="document", cascade="all, delete-orphan")
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(UTC)
     )

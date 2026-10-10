@@ -1,3 +1,4 @@
+from devdocs_hub.rag.chunker import Chunker
 from pytest import raises
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
@@ -54,7 +55,8 @@ class TestDocumentService:
         Base.metadata.create_all(engine)
 
         with Session(engine) as session:
-            repo = DocumentRepository(session)
+            chunker = Chunker()
+            repo = DocumentRepository(session, chunker)
             service = DocumentService(repo)
             created = service.create_document("title", "source", "content")
             assert created is not None
@@ -69,7 +71,8 @@ class TestDocumentService:
         Base.metadata.create_all(engine)
 
         with Session(engine) as session:
-            repo = DocumentRepository(session)
+            chunker = Chunker()
+            repo = DocumentRepository(session, chunker)
             service = DocumentService(repo)
             created = service.create_document("title", "source", "content")
             assert created is not None
@@ -86,7 +89,8 @@ class TestDocumentService:
         Base.metadata.create_all(engine)
 
         with Session(engine) as session:
-            repo = DocumentRepository(session)
+            chunker = Chunker()
+            repo = DocumentRepository(session, chunker)
             service = DocumentService(repo)
             service.create_document("title0", "source", "content")
             service.create_document("title1", "source", "content")
