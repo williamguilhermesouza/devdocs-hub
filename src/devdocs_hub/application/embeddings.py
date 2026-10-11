@@ -6,5 +6,5 @@ class EmbeddingProvider(Protocol):
     def embed_text(self, text: str) -> Vector:
         ...
     
-    def embed_texts(self, texts: Sequence[str]) -> list[Vector]:
+    def embed_many(self, texts: Sequence[str]) -> list[Vector]:
         ...
