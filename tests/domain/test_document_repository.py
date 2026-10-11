@@ -5,6 +5,7 @@ from devdocs_hub.db.core import Base, Chunk
 from devdocs_hub.domain.document_repository import DocumentRepository
 from devdocs_hub.domain.documents import Document
 from devdocs_hub.rag.chunker import Chunker
+from tests.fakes.embeddings import FakeEmbeddingsProvider
 
 
 class TestDocumentRepository:
@@ -13,7 +14,8 @@ class TestDocumentRepository:
         Base.metadata.create_all(engine)
         with Session(engine) as session:
             chunker = Chunker()
-            repo = DocumentRepository(session, chunker)
+            embeds = FakeEmbeddingsProvider()
+            repo = DocumentRepository(session, chunker, embeds)
 
             for i in range(10):
                 doc = Document(id=None,title=f"title{i}",source=f"source{i}",content=f"content{i}")
@@ -31,7 +33,8 @@ class TestDocumentRepository:
         chunker = Chunker(max_words=1, overlap_words=0)
 
         with Session(engine) as session:
-            repo = DocumentRepository(session, chunker)
+            embeds = FakeEmbeddingsProvider()
+            repo = DocumentRepository(session, chunker, embeds)
 
             doc_content = 'this should persist 5 chunks'
             splitted_content = doc_content.split()
@@ -55,7 +58,8 @@ class TestDocumentRepository:
         chunker = Chunker(max_words=1, overlap_words=0)
 
         with Session(engine) as session:
-            repo = DocumentRepository(session, chunker)
+            embeds = FakeEmbeddingsProvider()
+            repo = DocumentRepository(session, chunker, embeds)
 
             doc_content = 'this should persist 5 chunks'
             doc = Document(id=None,title="title",source="source",content=doc_content)

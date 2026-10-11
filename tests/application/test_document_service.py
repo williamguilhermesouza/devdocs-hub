@@ -9,6 +9,7 @@ from devdocs_hub.db.core import Base
 from devdocs_hub.domain.document_repository import DocumentRepository
 from devdocs_hub.domain.documents import Document
 from devdocs_hub.domain.repository import InMemoryRepository
+from tests.fakes.embeddings import FakeEmbeddingsProvider
 
 
 class TestDocumentService:
@@ -56,7 +57,8 @@ class TestDocumentService:
 
         with Session(engine) as session:
             chunker = Chunker()
-            repo = DocumentRepository(session, chunker)
+            embeds = FakeEmbeddingsProvider()
+            repo = DocumentRepository(session, chunker, embeds)
             service = DocumentService(repo)
             created = service.create_document("title", "source", "content")
             assert created is not None
@@ -72,7 +74,8 @@ class TestDocumentService:
 
         with Session(engine) as session:
             chunker = Chunker()
-            repo = DocumentRepository(session, chunker)
+            embeds = FakeEmbeddingsProvider()
+            repo = DocumentRepository(session, chunker, embeds)
             service = DocumentService(repo)
             created = service.create_document("title", "source", "content")
             assert created is not None
@@ -90,7 +93,8 @@ class TestDocumentService:
 
         with Session(engine) as session:
             chunker = Chunker()
-            repo = DocumentRepository(session, chunker)
+            embeds = FakeEmbeddingsProvider()
+            repo = DocumentRepository(session, chunker, embeds)
             service = DocumentService(repo)
             service.create_document("title0", "source", "content")
             service.create_document("title1", "source", "content")

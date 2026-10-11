@@ -1,7 +1,9 @@
 from sqlalchemy import select, delete
 from sqlalchemy.orm import Session
+from uuid import uuid4 as uuid
 
 from devdocs_hub import db
+from devdocs_hub.application.embeddings import EmbeddingProvider, Vector
 from devdocs_hub.db.core import Chunk
 from devdocs_hub.db.core import Document as DbDocument
 from devdocs_hub.rag.chunker import Chunker
@@ -10,9 +12,11 @@ from .documents import Document
 
 
 class DocumentRepository:
-    def __init__(self, session: Session, chunker: Chunker):
+    def __init__(self, session: Session, chunker: Chunker, embedding_provider: EmbeddingProvider):
         self._session = session
         self._chunker = chunker
+        self._embedding_provider = embedding_provider
+        self.embeddings: dict[str, Vector] = {}
 
     def add(self, item: Document) -> Document:
         chunks = self._chunker.chunk_document(item)
@@ -45,7 +49,11 @@ class DocumentRepository:
                 chunks.append(chunk)
 
             for chunk in chunks:
+                embedding = self._embedding_provider.embed_text(chunk.content)
+                embd_id = str(uuid())
+                self.embeddings[embd_id] = embedding
                 chunk.document_id = db_document.id
+                chunk.embedding_id = embd_id
 
             session.add_all(chunks)
 
