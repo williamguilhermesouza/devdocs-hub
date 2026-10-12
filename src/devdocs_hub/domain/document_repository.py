@@ -12,11 +12,11 @@ from .documents import Document
 
 
 class DocumentRepository:
-    def __init__(self, session: Session, chunker: Chunker, embedding_provider: EmbeddingProvider):
+    def __init__(self, session: Session, chunker: Chunker, embedding_provider: EmbeddingProvider, embeddings: dict[str, Vector]):
         self._session = session
         self._chunker = chunker
         self._embedding_provider = embedding_provider
-        self.embeddings: dict[str, Vector] = {}
+        self.embeddings = embeddings
 
     def add(self, item: Document) -> Document:
         chunks = self._chunker.chunk_document(item)
