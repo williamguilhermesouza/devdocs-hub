@@ -12,7 +12,13 @@ from .documents import Document
 
 
 class DocumentRepository:
-    def __init__(self, session: Session, chunker: Chunker, embedding_provider: EmbeddingProvider, embeddings: dict[str, Vector]):
+    def __init__(
+        self,
+        session: Session,
+        chunker: Chunker,
+        embedding_provider: EmbeddingProvider,
+        embeddings: dict[str, Vector],
+    ):
         self._session = session
         self._chunker = chunker
         self._embedding_provider = embedding_provider
@@ -36,7 +42,7 @@ class DocumentRepository:
                 db_document.source = item.source
                 db_document.content = item.content
                 db_document.chunks.clear()
-                
+
             session.flush()
 
             if not chunks:

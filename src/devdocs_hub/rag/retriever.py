@@ -1,4 +1,3 @@
-
 from dataclasses import dataclass
 
 from sqlalchemy import select
@@ -14,38 +13,48 @@ class SearchResult:
     score: float
     source: Chunk
 
+
 class Retriever:
-    def __init__(self, session: Session, embedding_provider: EmbeddingProvider, embeddings: dict[str, Vector]):
+    def __init__(
+        self,
+        session: Session,
+        embedding_provider: EmbeddingProvider,
+        embeddings: dict[str, Vector],
+    ):
         self._session = session
         self._embedding_provider = embedding_provider
         self._embeddings = embeddings
 
-    def search(self, query: str, limit:int = 5) -> list[SearchResult]:
+    def search(self, query: str, limit: int = 5) -> list[SearchResult]:
         if limit < 1:
             raise ValueError("limit must be positive")
 
         embedding = self._embedding_provider.embed_text(query)
-        comparisons: dict[str, float] = { a: cosine_similarity(b, embedding) for a, b in self._embeddings.items() }
-        s = sorted(comparisons.items(), key=lambda item: item[1], reverse=True)
+        comparisons: dict[str, float] = {
+            a: cosine_similarity(b, embedding) for a, b in self._embeddings.items()
+        }
 
-        s = s[:limit]
-        embed_ids = [x[0] for x in s]
-        results: list[SearchResult] = []
+        ranked_ids = [
+            embedding_id
+            for embedding_id, score in sorted(
+                comparisons.items(),
+                key=lambda item: item[1],
+                reverse=True,
+            )[:limit]
+        ]
 
-        stmt = select(Chunk).where(Chunk.embedding_id.in_(embed_ids))
-        with self._session as session:
-            chunks = session.scalars(stmt).all()
+        stmt = select(Chunk).where(Chunk.embedding_id.in_(ranked_ids))
+        chunks = self._session.scalars(stmt).all()
 
-            for chunk in chunks:
-                results.append(SearchResult(score=comparisons[chunk.embedding_id], source=chunk))
+        chunks_by_embedding_id = {
+            chunk.embedding_id: chunk for chunk in chunks
+        }
 
-        return results
-
-
-
-
-
-
-
-
-        
+        return [
+            SearchResult(
+                score=comparisons[embedding_id],
+                source=chunks_by_embedding_id[embedding_id],
+            )
+            for embedding_id in ranked_ids
+            if embedding_id in chunks_by_embedding_id
+        ]
