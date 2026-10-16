@@ -59,4 +59,4 @@ class Chunk(Base):
     position: Mapped[int]
     content: Mapped[str]
     document: Mapped["Document"] = relationship(back_populates="chunks")
-    embedding_id = Mapped[str]
+    embedding_id: Mapped[str]

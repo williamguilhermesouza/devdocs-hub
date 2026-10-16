@@ -14,8 +14,10 @@ class TestDocumentRepository:
         Base.metadata.create_all(engine)
         with Session(engine) as session:
             chunker = Chunker()
-            embeds = FakeEmbeddingsProvider()
-            repo = DocumentRepository(session, chunker, embeds)
+            embeds_prov = FakeEmbeddingsProvider()
+            embds = {}
+
+            repo = DocumentRepository(session, chunker, embeds_prov, embds)
 
             for i in range(10):
                 doc = Document(id=None,title=f"title{i}",source=f"source{i}",content=f"content{i}")
@@ -34,7 +36,8 @@ class TestDocumentRepository:
 
         with Session(engine) as session:
             embeds = FakeEmbeddingsProvider()
-            repo = DocumentRepository(session, chunker, embeds)
+            embds = {}
+            repo = DocumentRepository(session, chunker, embeds, embds)
 
             doc_content = 'this should persist 5 chunks'
             splitted_content = doc_content.split()
@@ -59,7 +62,8 @@ class TestDocumentRepository:
 
         with Session(engine) as session:
             embeds = FakeEmbeddingsProvider()
-            repo = DocumentRepository(session, chunker, embeds)
+            embds = {}
+            repo = DocumentRepository(session, chunker, embeds, embds)
 
             doc_content = 'this should persist 5 chunks'
             doc = Document(id=None,title="title",source="source",content=doc_content)

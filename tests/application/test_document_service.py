@@ -57,8 +57,9 @@ class TestDocumentService:
 
         with Session(engine) as session:
             chunker = Chunker()
-            embeds = FakeEmbeddingsProvider()
-            repo = DocumentRepository(session, chunker, embeds)
+            embeds_prov = FakeEmbeddingsProvider()
+            embds = {}
+            repo = DocumentRepository(session, chunker, embeds_prov, embds)
             service = DocumentService(repo)
             created = service.create_document("title", "source", "content")
             assert created is not None
@@ -75,7 +76,8 @@ class TestDocumentService:
         with Session(engine) as session:
             chunker = Chunker()
             embeds = FakeEmbeddingsProvider()
-            repo = DocumentRepository(session, chunker, embeds)
+            embds = {}
+            repo = DocumentRepository(session, chunker, embeds, embds)
             service = DocumentService(repo)
             created = service.create_document("title", "source", "content")
             assert created is not None
@@ -94,7 +96,8 @@ class TestDocumentService:
         with Session(engine) as session:
             chunker = Chunker()
             embeds = FakeEmbeddingsProvider()
-            repo = DocumentRepository(session, chunker, embeds)
+            embds = {}
+            repo = DocumentRepository(session, chunker, embeds, embds)
             service = DocumentService(repo)
             service.create_document("title0", "source", "content")
             service.create_document("title1", "source", "content")
