@@ -8,9 +8,9 @@ from sqlalchemy.orm import Session
 from devdocs_hub.application.documents import DocumentService
 from devdocs_hub.application.embeddings import Vector
 from devdocs_hub.domain.document_repository import DocumentRepository
+from devdocs_hub.rag.chunker import Chunker
 from devdocs_hub.rag.embeddings import SentenceTransformerProvider
 from devdocs_hub.settings import settings
-from devdocs_hub.rag.chunker import Chunker
 
 engine = create_engine(settings.db_url, echo=True)
 

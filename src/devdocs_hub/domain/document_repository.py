@@ -1,8 +1,8 @@
-from sqlalchemy import select, delete
-from sqlalchemy.orm import Session
 from uuid import uuid4 as uuid
 
-from devdocs_hub import db
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
 from devdocs_hub.application.embeddings import EmbeddingProvider, Vector
 from devdocs_hub.db.core import Chunk
 from devdocs_hub.db.core import Document as DbDocument

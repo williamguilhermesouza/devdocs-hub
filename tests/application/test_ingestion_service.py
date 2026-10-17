@@ -1,12 +1,11 @@
 import asyncio
 
-from sqlalchemy import NotNullable
 from pytest import raises
 
 from devdocs_hub.application.documents import DocumentService
 from devdocs_hub.application.ingestion import DocumentIngestionService
-from devdocs_hub.domain.repository import InMemoryRepository
 from devdocs_hub.domain.documents import Document
+from devdocs_hub.domain.repository import InMemoryRepository
 from devdocs_hub.ingestion.errors import FetchError
 from devdocs_hub.ingestion.fetcher import Fetcher
 from tests.fakes.fake_client import FakeClient
@@ -47,7 +46,7 @@ class TestIngestionService:
         url = "http://example.org"
 
         with raises(FetchError):
-            created_doc = await sut.ingest_url(url)
+            await sut.ingest_url(url)
 
     def test_ingest_urls(self):
         asyncio.run(self._test_ingest_urls())

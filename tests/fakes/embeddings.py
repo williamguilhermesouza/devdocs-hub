@@ -1,5 +1,5 @@
 
-from typing import Sequence
+from collections.abc import Sequence
 
 from devdocs_hub.application.embeddings import Vector
 

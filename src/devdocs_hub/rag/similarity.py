@@ -1,4 +1,4 @@
-from math import sqrt, pow
+from math import pow, sqrt
 
 from devdocs_hub.application.embeddings import Vector
 from devdocs_hub.rag.errors import VectorWithDifferentDimensionException

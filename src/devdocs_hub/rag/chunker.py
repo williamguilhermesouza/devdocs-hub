@@ -1,5 +1,5 @@
-from devdocs_hub.domain.documents import Document
 from devdocs_hub.db.core import Chunk
+from devdocs_hub.domain.documents import Document
 
 
 class Chunker:

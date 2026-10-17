@@ -1,12 +1,12 @@
-from devdocs_hub.application.embeddings import Vector
+from collections.abc import Sequence
+
 import pytest
-from typing import Sequence
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
+from devdocs_hub.application.embeddings import Vector
 from devdocs_hub.db.core import Base, Chunk
 from devdocs_hub.rag.retriever import Retriever
-from tests.fakes.embeddings import FakeEmbeddingsProvider
 
 
 class StubEmbeddingProvider:

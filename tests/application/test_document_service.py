@@ -1,4 +1,3 @@
-from devdocs_hub.rag.chunker import Chunker
 from pytest import raises
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
@@ -9,6 +8,7 @@ from devdocs_hub.db.core import Base
 from devdocs_hub.domain.document_repository import DocumentRepository
 from devdocs_hub.domain.documents import Document
 from devdocs_hub.domain.repository import InMemoryRepository
+from devdocs_hub.rag.chunker import Chunker
 from tests.fakes.embeddings import FakeEmbeddingsProvider
 
 
