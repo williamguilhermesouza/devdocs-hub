@@ -9,6 +9,7 @@ from devdocs_hub.application.documents import DocumentService
 from devdocs_hub.domain.document_repository import DocumentRepository
 from devdocs_hub.rag.chunker import Chunker
 from devdocs_hub.rag.embeddings import SentenceTransformerProvider
+from devdocs_hub.rag.retriever import Retriever
 from devdocs_hub.settings import settings
 
 engine = create_engine(settings.db_url, echo=True)
@@ -25,4 +26,10 @@ def get_document_service(session: sessionDeps) -> DocumentService:
     repository = DocumentRepository(session, chunker, embeddings_provider)
     return DocumentService(repository)
 
+def get_retriever(session: sessionDeps) -> Retriever:
+    embeddings_provider = SentenceTransformerProvider(model_name=settings.embedding_model_name)
+    retriever = Retriever(session, embeddings_provider)
+    return retriever
+
 serviceDeps = Annotated[DocumentService, Depends(get_document_service)]
+retrieverDeps = Annotated[Retriever, Depends(get_retriever)]

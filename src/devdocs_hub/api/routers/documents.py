@@ -2,12 +2,13 @@ from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Query, status
 
-from devdocs_hub.api.dependencies import serviceDeps
+from devdocs_hub.api.dependencies import retrieverDeps, serviceDeps
 from devdocs_hub.api.schemas.documents import (
     DocumentCreate,
     DocumentListResponse,
     DocumentResponse,
 )
+from devdocs_hub.api.schemas.search import SearchResponse, SearchResult
 from devdocs_hub.application.errors import DocumentNotFound
 
 router = APIRouter(
@@ -63,3 +64,21 @@ async def delete_document(service: serviceDeps, doc_id: int) -> None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Error deleting document"
         )
+
+@router.post("/search")
+async def search(service: retrieverDeps, query: str, limit: int = 5) -> SearchResponse:
+    results = service.search(query, limit)
+    response = SearchResponse(
+        query=query,
+        results=[
+            SearchResult(
+                document_id=result.source.document_id,
+                chunk_id=result.source.id,
+                score=result.score,
+                content=result.source.content,
+                source=result.source.document.source,
+            )
+            for result in results
+        ],
+    )
+    return response

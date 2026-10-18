@@ -3,9 +3,8 @@ from dataclasses import dataclass
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from devdocs_hub.application.embeddings import EmbeddingProvider, Vector
+from devdocs_hub.application.embeddings import EmbeddingProvider
 from devdocs_hub.db.core import Chunk
-from devdocs_hub.rag.similarity import cosine_similarity
 
 
 @dataclass
