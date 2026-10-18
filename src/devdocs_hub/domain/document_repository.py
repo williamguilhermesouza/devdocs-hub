@@ -1,10 +1,9 @@
-from uuid import uuid4 as uuid
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from devdocs_hub.application.embeddings import EmbeddingProvider, Vector
-from devdocs_hub.db.core import Chunk
+from devdocs_hub.application.embeddings import EmbeddingProvider
+from devdocs_hub.db.core import Chunk, Embedding
 from devdocs_hub.db.core import Document as DbDocument
 from devdocs_hub.rag.chunker import Chunker
 
@@ -17,12 +16,10 @@ class DocumentRepository:
         session: Session,
         chunker: Chunker,
         embedding_provider: EmbeddingProvider,
-        embeddings: dict[str, Vector],
     ):
         self._session = session
         self._chunker = chunker
         self._embedding_provider = embedding_provider
-        self.embeddings = embeddings
 
     def add(self, item: Document) -> Document:
         chunks = self._chunker.chunk_document(item)
@@ -55,11 +52,13 @@ class DocumentRepository:
                 chunks.append(chunk)
 
             for chunk in chunks:
-                embedding = self._embedding_provider.embed_text(chunk.content)
-                embd_id = str(uuid())
-                self.embeddings[embd_id] = embedding
+                vec = self._embedding_provider.embed_text(chunk.content)
+                embedding = Embedding(vector=vec)
+                session.add(embedding)
+                session.flush()
+
                 chunk.document_id = db_document.id
-                chunk.embedding_id = embd_id
+                chunk.embedding_id = embedding.id
 
             session.add_all(chunks)
 

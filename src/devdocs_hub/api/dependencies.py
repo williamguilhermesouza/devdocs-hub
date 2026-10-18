@@ -6,7 +6,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 from devdocs_hub.application.documents import DocumentService
-from devdocs_hub.application.embeddings import Vector
 from devdocs_hub.domain.document_repository import DocumentRepository
 from devdocs_hub.rag.chunker import Chunker
 from devdocs_hub.rag.embeddings import SentenceTransformerProvider
@@ -20,11 +19,10 @@ def get_session() -> Iterator[Session]:
 
 sessionDeps = Annotated[Session, Depends(get_session)]
 chunker = Chunker()
-embeddings: dict[str, Vector] = {} 
 
 def get_document_service(session: sessionDeps) -> DocumentService:
     embeddings_provider = SentenceTransformerProvider(model_name=settings.embedding_model_name)
-    repository = DocumentRepository(session, chunker, embeddings_provider, embeddings)
+    repository = DocumentRepository(session, chunker, embeddings_provider)
     return DocumentService(repository)
 
 serviceDeps = Annotated[DocumentService, Depends(get_document_service)]

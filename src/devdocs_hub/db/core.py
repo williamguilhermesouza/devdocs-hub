@@ -1,6 +1,6 @@
 from datetime import UTC, datetime
-from pgvector.sqlalchemy import VECTOR
 
+from pgvector.sqlalchemy import VECTOR
 from sqlalchemy import (
     DateTime,
     ForeignKey,
