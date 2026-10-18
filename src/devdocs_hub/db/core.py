@@ -1,15 +1,24 @@
 from datetime import UTC, datetime
+from pgvector.sqlalchemy import VECTOR
 
 from sqlalchemy import (
     DateTime,
     ForeignKey,
+    MetaData,
     String,
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
+NAMING_CONVENTION = {
+    "ix": "ix_%(column_0_label)s",
+    "uq": "uq_%(table_name)s_%(column_0_name)s",
+    "ck": "ck_%(table_name)s_%(constraint_name)s",
+    "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+    "pk": "pk_%(table_name)s",
+}
 
 class Base(DeclarativeBase):
-    pass
+    metadata = MetaData(naming_convention=NAMING_CONVENTION)
 
 
 class User(Base):
@@ -59,4 +68,9 @@ class Chunk(Base):
     position: Mapped[int]
     content: Mapped[str]
     document: Mapped["Document"] = relationship(back_populates="chunks")
-    embedding_id: Mapped[str]
+    embedding_id = mapped_column(ForeignKey("embeddings.id"))
+
+class Embedding(Base):
+    __tablename__ = "embeddings"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    vector: Mapped[list[float]] = mapped_column(VECTOR(384), nullable=False)
