@@ -26,7 +26,7 @@ class Chunker:
                     document_id=content.id,
                     position=0,
                     content=content.content,
-                    embedding_id=None,
+                    embedding=None,
                 )
             ]
 
@@ -42,7 +42,7 @@ class Chunker:
                 document_id=content.id,
                 position=position,
                 content=chunk_content,
-                embedding_id=None,
+                embedding=None,
             )
             chunks.append(chunk)
 

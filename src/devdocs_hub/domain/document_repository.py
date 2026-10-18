@@ -3,7 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from devdocs_hub.application.embeddings import EmbeddingProvider
-from devdocs_hub.db.core import Chunk, Embedding
+from devdocs_hub.db.core import Chunk
 from devdocs_hub.db.core import Document as DbDocument
 from devdocs_hub.rag.chunker import Chunker
 
@@ -47,18 +47,15 @@ class DocumentRepository:
                     document_id=db_document.id,
                     position=0,
                     content=item.content,
-                    embedding_id=None,
+                    embedding=[],
                 )
                 chunks.append(chunk)
 
             for chunk in chunks:
                 vec = self._embedding_provider.embed_text(chunk.content)
-                embedding = Embedding(vector=vec)
-                session.add(embedding)
-                session.flush()
 
                 chunk.document_id = db_document.id
-                chunk.embedding_id = embedding.id
+                chunk.embedding = vec
 
             session.add_all(chunks)
 

@@ -19,42 +19,25 @@ class Retriever:
         self,
         session: Session,
         embedding_provider: EmbeddingProvider,
-        embeddings: dict[str, Vector],
     ):
         self._session = session
         self._embedding_provider = embedding_provider
-        self._embeddings = embeddings
 
     def search(self, query: str, limit: int = 5) -> list[SearchResult]:
         if limit < 1:
             raise ValueError("limit must be positive")
 
         embedding = self._embedding_provider.embed_text(query)
-        comparisons: dict[str, float] = {
-            a: cosine_similarity(b, embedding) for a, b in self._embeddings.items()
-        }
+        distance = Chunk.embedding.cosine_distance(embedding)
+        similarity = (1.0 - distance).label("score")
 
-        ranked_ids = [
-            embedding_id
-            for embedding_id, score in sorted(
-                comparisons.items(),
-                key=lambda item: item[1],
-                reverse=True,
-            )[:limit]
-        ]
+        stmt = (
+            select(Chunk, similarity)
+            .where(Chunk.embedding.is_not(None))
+            .order_by(distance.asc())
+            .limit(limit)
+        )
 
-        stmt = select(Chunk).where(Chunk.embedding_id.in_(ranked_ids))
-        chunks = self._session.scalars(stmt).all()
+        rows = self._session.execute(stmt).all()
 
-        chunks_by_embedding_id = {
-            chunk.embedding_id: chunk for chunk in chunks
-        }
-
-        return [
-            SearchResult(
-                score=comparisons[embedding_id],
-                source=chunks_by_embedding_id[embedding_id],
-            )
-            for embedding_id in ranked_ids
-            if embedding_id in chunks_by_embedding_id
-        ]
+        return [SearchResult(score=score, source=chunk) for chunk, score in rows]
