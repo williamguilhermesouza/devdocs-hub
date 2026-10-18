@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from devdocs_hub.application.documents import DocumentService
 from devdocs_hub.domain.document_repository import DocumentRepository
 from devdocs_hub.rag.chunker import Chunker
-from devdocs_hub.rag.embeddings import SentenceTransformerProvider
+from devdocs_hub.rag.embeddings import get_embedding_provider
 from devdocs_hub.rag.retriever import Retriever
 from devdocs_hub.settings import settings
 
@@ -22,13 +22,11 @@ sessionDeps = Annotated[Session, Depends(get_session)]
 chunker = Chunker()
 
 def get_document_service(session: sessionDeps) -> DocumentService:
-    embeddings_provider = SentenceTransformerProvider(model_name=settings.embedding_model_name)
-    repository = DocumentRepository(session, chunker, embeddings_provider)
+    repository = DocumentRepository(session, chunker, get_embedding_provider())
     return DocumentService(repository)
 
 def get_retriever(session: sessionDeps) -> Retriever:
-    embeddings_provider = SentenceTransformerProvider(model_name=settings.embedding_model_name)
-    retriever = Retriever(session, embeddings_provider)
+    retriever = Retriever(session, get_embedding_provider())
     return retriever
 
 serviceDeps = Annotated[DocumentService, Depends(get_document_service)]

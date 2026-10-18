@@ -22,6 +22,7 @@ dependencies = [
 
 [project.scripts]
 devdocs-hub = "devdocs_hub:main"
+devdocs-hub-mcp = "devdocs_hub.mcp.server:main"
 
 [build-system]
 requires = ["uv_build>=0.12.5,<0.13.0"]
