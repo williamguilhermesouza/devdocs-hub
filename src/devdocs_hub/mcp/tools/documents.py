@@ -1,6 +1,7 @@
+from devdocs_hub.api.schemas.answer import AnswerResponse
 from devdocs_hub.api.schemas.documents import DocumentCreate, DocumentListResponse, DocumentResponse
 from devdocs_hub.application.errors import DocumentNotFound
-from devdocs_hub.mcp.dependencies import document_service_context
+from devdocs_hub.mcp.dependencies import answer_service_context, document_service_context
 
 from mcp.server import MCPServer
 
@@ -39,3 +40,9 @@ def register_document_tools(mcp: MCPServer):
         with document_service_context() as service:
             if not service.delete_document(doc_id):
                 raise ValueError("Requested document could not be deleted")
+
+    @mcp.tool()
+    async def ask(question: str) -> AnswerResponse:
+        with answer_service_context() as service:
+            response = service.ask(question)
+            return AnswerResponse(answer=response.answer, chunks=response.chunks)
