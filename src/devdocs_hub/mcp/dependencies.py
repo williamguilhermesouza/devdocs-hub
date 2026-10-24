@@ -19,10 +19,18 @@ def get_session() -> Iterator[Session]:
 
 chunker = Chunker()
 
+def get_document_repository(session: Session) -> DocumentRepository:
+    return DocumentRepository(session, chunker, get_embedding_provider())
+
+
 def get_document_service(session: Session) -> DocumentService:
     repository = DocumentRepository(session, chunker, get_embedding_provider())
     return DocumentService(repository)
 
+@contextmanager
+def document_repository_context() -> Iterator[DocumentRepository]:
+    with Session(engine) as session:
+        yield get_document_repository(session)
 
 @contextmanager
 def document_service_context() -> Iterator[DocumentService]:

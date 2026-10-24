@@ -1,4 +1,4 @@
-from devdocs_hub.api.schemas.documents import DocumentListResponse, DocumentResponse
+from devdocs_hub.api.schemas.documents import DocumentCreate, DocumentListResponse, DocumentResponse
 from devdocs_hub.application.errors import DocumentNotFound
 from devdocs_hub.mcp.dependencies import document_service_context
 
@@ -28,10 +28,10 @@ def register_document_tools(mcp: MCPServer):
 
     @mcp.tool()
     async def create_document(
-        title: str, source: str, content: str
+            doc: DocumentCreate
     ) -> DocumentResponse:
         with document_service_context() as service:
-            res = service.create_document(title, source, content)
+            res = service.create_document(doc.title, str(doc.source), doc.content)
             return DocumentResponse.from_doc(res)
 
     @mcp.tool()

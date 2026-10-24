@@ -1,3 +1,4 @@
+from devdocs_hub.mcp.resources.documents import register_document_resources
 from devdocs_hub.mcp.tools.documents import register_document_tools
 from mcp.server import MCPServer
 from devdocs_hub.rag.embeddings import get_embedding_provider
@@ -10,6 +11,7 @@ def health() -> dict[str, str]:
     return {"status": "ok"}
 
 register_document_tools(mcp)
+register_document_resources(mcp)
 
 
 def main() -> None:
