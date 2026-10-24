@@ -19,3 +19,5 @@ def main() -> None:
     get_embedding_provider()
     mcp.run(transport="stdio")
 
+if __name__ == '__main__':
+    main()
