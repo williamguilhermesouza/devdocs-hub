@@ -6,7 +6,7 @@ from devdocs_hub.rag.retriever import SearchResult
 
 
 @dataclass
-class Response:
+class AnswerResponse:
     answer: str
     chunks: list[Chunk]
 
@@ -29,9 +29,9 @@ class AnswerService:
         self._retriever = retriever
         self._llmprovider = llmprovider
 
-    def ask(self, question: str) -> Response:
+    def ask(self, question: str) -> AnswerResponse:
         search_results = self._retriever.search(question)
         context = Context(metadata={"embeddings": search_results})
         response = self._llmprovider.ask(context, question)
 
-        return Response(answer=response, chunks=[x.source for x in search_results])
+        return AnswerResponse(answer=response, chunks=[x.source for x in search_results])

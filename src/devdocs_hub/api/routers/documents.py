@@ -2,12 +2,13 @@ from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Query, status
 
-from devdocs_hub.api.dependencies import retrieverDeps, serviceDeps
+from devdocs_hub.api.dependencies import retrieverDeps, serviceDeps, answerDeps
 from devdocs_hub.api.schemas.documents import (
     DocumentCreate,
     DocumentListResponse,
     DocumentResponse,
 )
+from devdocs_hub.api.schemas.answer import AnswerResponse
 from devdocs_hub.api.schemas.search import SearchResponse, SearchResult
 from devdocs_hub.application.errors import DocumentNotFound
 
@@ -82,3 +83,9 @@ async def search(service: retrieverDeps, query: str, limit: int = 5) -> SearchRe
         ],
     )
     return response
+
+@router.post("/ask")
+async def ask(service: answerDeps, question: str) -> AnswerResponse:
+    response = service.ask(question)
+    return AnswerResponse(answer=response.answer, chunks=response.chunks)
+

@@ -12,6 +12,7 @@ dependencies = [
     "fastapi[standard]>=0.141.1",
     "httpx>=0.28.1",
     "mcp[cli]>=2.3.0",
+    "openai>=3.37.0",
     "pgvector>=0.5.1",
     "psycopg2-binary>=2.9.13",
     "pydantic>=2.13.5",
